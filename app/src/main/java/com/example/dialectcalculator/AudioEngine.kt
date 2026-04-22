@@ -7,6 +7,7 @@ import android.media.AudioManager
 import android.media.AudioRecord
 import android.media.MediaPlayer
 import android.media.MediaRecorder
+import android.media.PlaybackParams
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -458,7 +459,7 @@ class DialectPlaybackComposer(
         file
     }
 
-    suspend fun playFile(context: Context, file: File) = withContext(Dispatchers.Main) {
+    suspend fun playFile(context: Context, file: File, speed: Float = 1.0f) = withContext(Dispatchers.Main) {
         val player = MediaPlayer()
         player.setAudioAttributes(
             AudioAttributes.Builder()
@@ -470,6 +471,9 @@ class DialectPlaybackComposer(
             it.release()
         }
         player.prepare()
+        runCatching {
+            player.playbackParams = PlaybackParams().setSpeed(speed.coerceIn(0.5f, 1.5f))
+        }
         player.start()
     }
 

@@ -27,6 +27,7 @@ data class AppUiState(
     val isRecording: Boolean = false,
     val activeMode: RecordingMode? = null,
     val currentThreshold: Float = TrainingRepository.DEFAULT_THRESHOLD,
+    val playbackSpeed: Float = TrainingRepository.DEFAULT_PLAYBACK_SPEED,
 ) {
     val completedCount: Int
         get() = trainingItems.sumOf { it.completedAttempts }
@@ -86,6 +87,7 @@ class DialectCalculatorViewModel(
                     trainingItems = mapTrainingItems(persisted.samples),
                     isTrainingComplete = persisted.trainingCompleted,
                     currentThreshold = persisted.threshold,
+                    playbackSpeed = persisted.playbackSpeed,
                     lastResultText = if (persisted.trainingCompleted) {
                         state.lastResultText
                     } else {
@@ -183,7 +185,7 @@ class DialectCalculatorViewModel(
     fun playTrainingSample(context: Context, sample: TrainingSample?) {
         if (sample == null) return
         viewModelScope.launch {
-            playbackComposer.playFile(context, File(sample.audioPath))
+            playbackComposer.playFile(context, File(sample.audioPath), _uiState.value.playbackSpeed)
         }
     }
 
@@ -232,7 +234,7 @@ class DialectCalculatorViewModel(
                 evaluation.spokenSequence,
                 persisted.samples,
             )
-            playbackComposer.playFile(context, playback)
+            playbackComposer.playFile(context, playback, _uiState.value.playbackSpeed)
             _uiState.update {
                 it.copy(
                     activeMode = null,
@@ -255,6 +257,13 @@ class DialectCalculatorViewModel(
         viewModelScope.launch {
             repository.setThreshold(threshold)
             _uiState.update { it.copy(currentThreshold = threshold) }
+        }
+    }
+
+    fun updatePlaybackSpeed(playbackSpeed: Float) {
+        viewModelScope.launch {
+            repository.setPlaybackSpeed(playbackSpeed)
+            _uiState.update { it.copy(playbackSpeed = playbackSpeed) }
         }
     }
 

@@ -18,6 +18,7 @@ class TrainingRepository(private val context: Context) {
             return@withContext PersistedTrainingData(
                 trainingCompleted = false,
                 threshold = DEFAULT_THRESHOLD,
+                playbackSpeed = DEFAULT_PLAYBACK_SPEED,
                 samples = emptyList(),
             )
         }
@@ -43,6 +44,7 @@ class TrainingRepository(private val context: Context) {
         PersistedTrainingData(
             trainingCompleted = json.optBoolean("trainingCompleted", false),
             threshold = json.optDouble("threshold", DEFAULT_THRESHOLD.toDouble()).toFloat(),
+            playbackSpeed = json.optDouble("playbackSpeed", DEFAULT_PLAYBACK_SPEED.toDouble()).toFloat(),
             samples = samples,
         )
     }
@@ -61,6 +63,7 @@ class TrainingRepository(private val context: Context) {
             PersistedTrainingData(
                 trainingCompleted = completed,
                 threshold = current.threshold,
+                playbackSpeed = current.playbackSpeed,
                 samples = updatedSamples.sortedWith(compareBy({ it.token.ordinal }, { it.attemptIndex })),
             ),
         )
@@ -69,6 +72,11 @@ class TrainingRepository(private val context: Context) {
     suspend fun setThreshold(threshold: Float) = withContext(Dispatchers.IO) {
         val current = load()
         write(current.copy(threshold = threshold))
+    }
+
+    suspend fun setPlaybackSpeed(playbackSpeed: Float) = withContext(Dispatchers.IO) {
+        val current = load()
+        write(current.copy(playbackSpeed = playbackSpeed))
     }
 
     suspend fun reset() = withContext(Dispatchers.IO) {
@@ -98,6 +106,7 @@ class TrainingRepository(private val context: Context) {
         val json = JSONObject()
             .put("trainingCompleted", data.trainingCompleted)
             .put("threshold", data.threshold.toDouble())
+            .put("playbackSpeed", data.playbackSpeed.toDouble())
             .put(
                 "samples",
                 JSONArray().apply {
@@ -124,7 +133,8 @@ class TrainingRepository(private val context: Context) {
     }
 
     companion object {
-        const val TRAINING_ATTEMPTS = 3
+        const val TRAINING_ATTEMPTS = 1
         const val DEFAULT_THRESHOLD = 0.72f
+        const val DEFAULT_PLAYBACK_SPEED = 1.0f
     }
 }
