@@ -71,6 +71,7 @@ data class EvaluationResult(
 data class PersistedTrainingData(
     val trainingCompleted: Boolean,
     val threshold: Float,
+    val playbackSpeed: Float,
     val samples: List<TrainingSample>,
 )
 

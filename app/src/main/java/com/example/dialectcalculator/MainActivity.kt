@@ -93,8 +93,10 @@ class MainActivity : ComponentActivity() {
                 if (showSettings) {
                     SettingsDialog(
                         threshold = state.currentThreshold,
+                        playbackSpeed = state.playbackSpeed,
                         onDismiss = { showSettings = false },
                         onSaveThreshold = viewModel::updateThreshold,
+                        onSavePlaybackSpeed = viewModel::updatePlaybackSpeed,
                         onReset = {
                             showSettings = false
                             viewModel.resetTraining()
@@ -255,7 +257,7 @@ private fun TrainingScreen(
             fontWeight = FontWeight.Bold,
         )
         Text(
-            text = "每个词录 3 遍，建议逐词说清楚，并在词与词之间保留轻微停顿。",
+            text = "每个词录 1 遍，建议逐词说清楚，并在词与词之间保留轻微停顿。",
             style = MaterialTheme.typography.bodyLarge,
             color = Color(0xFF415A77),
         )
@@ -486,19 +488,23 @@ private fun HoldButton(
 @Composable
 private fun SettingsDialog(
     threshold: Float,
+    playbackSpeed: Float,
     onDismiss: () -> Unit,
     onSaveThreshold: (Float) -> Unit,
+    onSavePlaybackSpeed: (Float) -> Unit,
     onReset: () -> Unit,
 ) {
     var sliderValue by remember(threshold) { mutableStateOf(threshold) }
+    var speedValue by remember(playbackSpeed) { mutableStateOf(playbackSpeed) }
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = {
                 onSaveThreshold(sliderValue)
+                onSavePlaybackSpeed(speedValue)
                 onDismiss()
             }) {
-                Text("保存阈值")
+                Text("保存设置")
             }
         },
         dismissButton = {
@@ -517,6 +523,9 @@ private fun SettingsDialog(
                 Text("当前识别阈值用于本地模板匹配，首版默认已经适配小词表。")
                 Slider(value = sliderValue, onValueChange = { sliderValue = it }, valueRange = 0.55f..0.9f)
                 Text("阈值：${"%.2f".format(sliderValue)}")
+                Text("播放速度用于试听和识别后播报。")
+                Slider(value = speedValue, onValueChange = { speedValue = it }, valueRange = 0.5f..1.5f)
+                Text("播放速度：${"%.2f".format(speedValue)}x")
                 Text("如需重新录入全部词条，请使用下方按钮。")
             }
         },
