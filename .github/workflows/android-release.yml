@@ -36,7 +36,10 @@ jobs:
       - name: Locate generated APK
         id: locate_apk
         run: |
-          APK_PATH=$(find app/build/outputs/apk/release -maxdepth 1 -type f -name "*.apk" | head -n 1)
+          APK_PATH=$(find app/build/outputs/apk/release -maxdepth 1 -type f -name "*.apk" ! -name "*-unsigned.apk" | head -n 1)
+          if [ -z "$APK_PATH" ]; then
+            APK_PATH=$(find app/build/outputs/apk/release -maxdepth 1 -type f -name "*.apk" | head -n 1)
+          fi
           if [ -z "$APK_PATH" ]; then
             echo "No APK generated under app/build/outputs/apk/release"
             exit 1
