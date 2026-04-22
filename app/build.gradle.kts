@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "com.example.dialectcalculator"
-    compileSdk = 29
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.dialectcalculator"
         minSdk = 24
-        targetSdk = 29
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -22,6 +22,7 @@ android {
 
     buildTypes {
         release {
+            signingConfig = signingConfigs.getByName("debug")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

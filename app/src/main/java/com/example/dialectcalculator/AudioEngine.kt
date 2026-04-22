@@ -295,7 +295,7 @@ class FeatureExtractor {
 
         for (index in buckets.indices) {
             if (bucketSizes[index] > 0) {
-                buckets[index] /= bucketSizes[index]
+                buckets[index] = buckets[index] / bucketSizes[index].toFloat()
             }
         }
 
